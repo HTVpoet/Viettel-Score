@@ -4,11 +4,15 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Table(name = "users")
 @Entity
 @Getter
 @Setter
-public class Users extends BaseEntity {
+public class Users extends BaseEntity implements Serializable {
+    private final static long serialVersionUID = 1L;
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
