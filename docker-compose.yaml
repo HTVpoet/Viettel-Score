@@ -61,3 +61,21 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
 
       CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+
+    environment:
+      MINIO_ROOT_USER: admin
+      MINIO_ROOT_PASSWORD: admin123456
+
+    command: server /data --console-address ":9001"
+
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+
+    volumes:
+      - ./minio-data:/data
