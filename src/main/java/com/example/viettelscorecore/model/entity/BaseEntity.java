@@ -1,4 +1,4 @@
-package com.example.viettelscorecore.model;
+package com.example.viettelscorecore.model.entity;
 
 import jakarta.persistence.Column;
 import lombok.Getter;
@@ -22,4 +22,16 @@ public class BaseEntity implements Serializable {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
+
+    @Column(name = "deleted")
+    private Boolean deleted = Boolean.FALSE;
+
+    @Column(name = "deleted_by")
+    private String deletedBy;
+
+    @Column(name = "created_by")
+    private String createdBy;
+
+    @Column(name = "updated_by")
+    private String updatedBy;
 }

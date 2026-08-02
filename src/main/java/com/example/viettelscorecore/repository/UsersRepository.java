@@ -1,6 +1,6 @@
 package com.example.viettelscorecore.repository;
 
-import com.example.viettelscorecore.model.Users;
+import com.example.viettelscorecore.model.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
