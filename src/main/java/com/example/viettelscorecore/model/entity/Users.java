@@ -16,7 +16,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Setter
 @Builder
-@SQLRestriction(value = "SELECT * from users where deleted == 0")
+@SQLRestriction("SELECT * FROM users WHERE deleted = false")
 public class Users extends BaseEntity {
 
     @Id
