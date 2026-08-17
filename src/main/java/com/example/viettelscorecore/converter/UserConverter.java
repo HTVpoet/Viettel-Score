@@ -8,23 +8,31 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConverter {
 
-    public UserResponse toResponse(Users user){
+    public UserResponse toResponse(Users user) {
         return UserResponse.builder()
-                .phone(user.getPhone())
-                .email(user.getEmail())
-                .address(user.getAddress())
+                .id(user.getId())
                 .name(user.getName())
-                .password(user.getPassword())
+                .email(user.getEmail())
+                .phone(user.getPhone())
+                .address(user.getAddress())
+                .avatar(user.getAvatar())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
+                .deletedAt(user.getDeletedAt())
+                .deleted(user.getDeleted())
+                .createdBy(user.getCreatedBy())
+                .updatedBy(user.getUpdatedBy())
+                .deletedBy(user.getDeletedBy())
                 .build();
     }
 
-    public Users toEntity(UserCreateRequest request){
-        return Users.builder()
-                .name(request.getName())
-                .phone(request.getPhone())
-                .email(request.getEmail())
-                .address(request.getAddress())
-                .password(request.getPassword())
-                .build();
+    public Users toEntity(UserCreateRequest request) {
+        Users user = new Users();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setAddress(request.getAddress());
+        user.setPhone(request.getPhone());
+        user.setPassword(request.getPassword());
+        return user;
     }
 }

@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### min-io ###
+minio-data
+node_modules
+.gitignore

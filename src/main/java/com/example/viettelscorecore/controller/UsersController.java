@@ -1,6 +1,8 @@
 package com.example.viettelscorecore.controller;
 
 import com.example.viettelscorecore.model.dto.request.UserCreateRequest;
+import com.example.viettelscorecore.model.dto.request.UserSearchRequest;
+import com.example.viettelscorecore.model.dto.response.ApiResponse;
 import com.example.viettelscorecore.model.dto.response.AvatarUploadResponse;
 import com.example.viettelscorecore.model.dto.response.BatchFileUploadResponse;
 import com.example.viettelscorecore.model.dto.response.UserResponse;
@@ -23,24 +25,18 @@ public class UsersController {
     private final UsersService usersService;
 
     @PostMapping
-    public UserResponse create(@RequestBody UserCreateRequest request) {
-        return usersService.createUser(request);
+    public ApiResponse<UserResponse> create(@RequestBody UserCreateRequest request) {
+        return ApiResponse.created(usersService.createUser(request));
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getAllUsers() {
-        List<UserResponse> users = usersService.getAllUsers();
-        return ResponseEntity.ok(users);
+    @PostMapping("/search")
+    public ApiResponse<List<UserResponse>> search(@RequestBody UserSearchRequest request) {
+        return ApiResponse.success(usersService.search(request.getKeywords()));
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<UserResponse> getUserById(@PathVariable Long userId) {
-        try {
-            UserResponse user = usersService.getUserById(userId);
-            return ResponseEntity.ok(user);
-        } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ApiResponse<UserResponse> getUserById(@PathVariable Long userId) {
+        return ApiResponse.success(usersService.getUserById(userId));
     }
 
     @PostMapping("/{userId}/avatar")
@@ -65,5 +61,16 @@ public class UsersController {
             @PathVariable Long userId,
             @RequestParam("files") MultipartFile[] files) {
         return usersService.batchUploadFiles(userId, files);
+    }
+
+    @DeleteMapping("/{userId}")
+    public ApiResponse<Void> deleteUser(@PathVariable Long userId) {
+        usersService.deleteUser(userId);
+        return ApiResponse.success("User deleted successfully", null);
+    }
+
+    @PutMapping("/{userId}")
+    public ApiResponse<UserResponse> updateUser(@PathVariable Long userId, @RequestBody UserCreateRequest request) {
+        return ApiResponse.success(usersService.updateUser(userId, request));
     }
 }

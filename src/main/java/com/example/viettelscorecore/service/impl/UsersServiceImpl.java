@@ -16,7 +16,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,6 +34,7 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
     private final UserConverter userConverter;
     private final FileStorageService fileStorageService;
+    private final PasswordEncoder passwordEncoder;
     private static final int MAX_FILES = 5;
 
 
@@ -47,9 +48,9 @@ public class UsersServiceImpl implements UsersService {
     @Transactional
     public UserResponse createUser(UserCreateRequest request) {
         log.info("Create user with request, {}", request);
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        request.setPassword(encoder.encode(request.getPassword()));
-        return userConverter.toResponse(usersRepository.save(userConverter.toEntity(request)));
+        Users user = userConverter.toEntity(request);
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        return userConverter.toResponse(usersRepository.save(user));
     }
 
     /**
@@ -72,9 +73,9 @@ public class UsersServiceImpl implements UsersService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<UserResponse> getAllUsers() {
-        log.info("Get all users");
-        return usersRepository.findAll()
+    public List<UserResponse> search(String keyword) {
+        log.info("Search users by keyword: {}", keyword);
+        return usersRepository.search(keyword)
                 .stream()
                 .map(userConverter::toResponse)
                 .toList();
@@ -270,6 +271,39 @@ public class UsersServiceImpl implements UsersService {
                         .message(successCount + " file(s) uploaded successfully, " + failureCount + " failed")
                         .build()
         );
+    }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+
+            Users user = usersRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Delete avatar if exists
+            if (user.getAvatar() != null && !user.getAvatar().isEmpty()) {
+                fileStorageService.deleteFile(user.getAvatar());
+            }
+            // Delete user
+            usersRepository.delete(user);
+    }
+
+    @Override
+    public UserResponse updateUser(Long userId, UserCreateRequest request) {
+            Users existingUser = usersRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+
+            // Update fields
+            existingUser.setName(request.getName());
+            existingUser.setEmail(request.getEmail());
+            existingUser.setAddress(request.getAddress());
+            existingUser.setPhone(request.getPhone());
+            if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                existingUser.setPassword(passwordEncoder.encode(request.getPassword()));
+            }
+
+            Users updatedUser = usersRepository.save(existingUser);
+            return userConverter.toResponse(updatedUser);
     }
 
     public void uploadFile(MultipartFile file, String objectName) {

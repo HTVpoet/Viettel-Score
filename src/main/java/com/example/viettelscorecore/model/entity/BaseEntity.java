@@ -1,27 +1,36 @@
 package com.example.viettelscorecore.model.entity;
 
 import jakarta.persistence.Column;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import lombok.Data;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 
-@Setter
-@Getter
-public class BaseEntity implements Serializable {
+@Data
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+public abstract class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @Column(name = "created_at")
-    private OffsetDateTime createdAt;
+    @CreatedDate
+    @Column(name = "created_at", updatable = false)
+    private Instant createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
-    private OffsetDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "deleted_at")
-    private OffsetDateTime deletedAt;
+    private Instant deletedAt;
 
     @Column(name = "deleted")
     private Boolean deleted = Boolean.FALSE;
@@ -29,9 +38,11 @@ public class BaseEntity implements Serializable {
     @Column(name = "deleted_by")
     private String deletedBy;
 
-    @Column(name = "created_by")
+    @CreatedBy
+    @Column(name = "created_by", updatable = false)
     private String createdBy;
 
+    @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
 }
